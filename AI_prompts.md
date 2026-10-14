@@ -181,3 +181,16 @@ Implementation note: Built in Claude Code. The first test run showed the agents 
 Follow-up prompt: After seeing a first draft, I said I would put it into my own words, rewrote the whole reflection myself, and pasted it back to have it placed in the Reflection tab.
 
 Implementation note: The first draft was generated in Claude Code from the real run (token counts, tool calls, and cash figures read from output/audit_trail.json and the working database). The text now in the Reflection tab is my rewrite of it; Claude Code only placed it on the page and added the scorecard table and token charts as supporting evidence.
+
+## Problem 11: Push to GitHub
+
+**Prompt typed:**
+
+> We need to push it to GitHub.
+> Push the work and code to a public github repo so graders can clone it and grade. I need to submit the URL to Canvas. Also put it in output/github_url.txt
+> Do not push the real env file to github. Include database files under data/ (the original and the work copy) so graders can run the app easily.
+> (The prompt also gave an expected file layout for the repo and said the README should explain: copy the original DB to the working copy when you need a clean run, start the MCP server, start the FastAPI backend, start the React board, and reset the DB before a full three-ticket run.)
+
+**Follow-up prompt:** None so far.
+
+Implementation note: Built in Claude Code. The repo is public at https://github.com/TomTsuruCo/campus-customs-hw5. The real .env is not included (only .env.example); the original and working databases are, with the working copy in its final resolved state. Before publishing, every file was scanned for the API key and personal paths, commits use my GitHub no-reply email, and a fresh clone was built and run end to end as a grader would.
