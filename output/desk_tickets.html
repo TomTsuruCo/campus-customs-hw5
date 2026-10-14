@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus Customs - Ticket Desk Plan</title>
+  <style>
+    :root { color-scheme: light; --ink: #182437; --muted: #5b6878; --line: #d8e0e8; --paper: #fff; --wash: #f2f5f8; --blue: #174f82; --blue-pale: #e6f0f8; --gold: #9a6a12; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--wash); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .shell { width: min(1060px, calc(100% - 32px)); margin: 34px auto 64px; }
+    header { margin-bottom: 22px; }
+    h1 { margin: 0 0 6px; font-size: clamp(1.65rem, 4vw, 2.3rem); letter-spacing: -.025em; }
+    .subtitle, .hint { color: var(--muted); }
+    .subtitle { margin: 0; }
+    .notice { margin: 20px 0; padding: 12px 16px; border-left: 4px solid var(--gold); background: #fff8e8; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+    .tab { border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); padding: 9px 15px; font: inherit; font-weight: 650; cursor: pointer; }
+    .tab[aria-selected="true"] { border-color: var(--blue); background: var(--blue); color: white; }
+    .tab:focus-visible { outline: 3px solid #80b9e7; outline-offset: 2px; }
+    .panel { margin-top: 18px; padding: clamp(18px, 4vw, 30px); border: 1px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: 0 6px 22px #1824370b; }
+    .panel[hidden] { display: none; }
+    h2 { margin: 0 0 14px; font-size: 1.5rem; }
+    h3 { margin: 26px 0 8px; font-size: 1.08rem; }
+    p { margin: 8px 0; }
+    ul, ol { padding-left: 1.35rem; }
+    li { margin: 6px 0; }
+    .tag { display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 999px; background: var(--blue-pale); color: var(--blue); font-size: .85rem; font-weight: 700; }
+    .actual { min-height: 86px; padding: 12px 14px; border: 1px dashed #aab7c5; border-radius: 8px; color: var(--muted); }
+    .coming { min-height: 110px; display: grid; place-items: center; border: 1px dashed #aab7c5; border-radius: 8px; color: var(--muted); text-align: center; }
+    code { overflow-wrap: anywhere; }
+    @media (max-width: 580px) { .shell { width: min(100% - 20px, 1060px); margin-top: 20px; } .tab { flex: 1 1 28%; padding: 8px 9px; } }
+
+    .actual.filled { border: 1px solid #b9d3ea; background: #f6fafe; color: var(--ink); }
+    .actual.filled p { margin: 10px 0 4px; }
+    .tag.ok { background: #d9f0e3; color: #17704a; }
+    .cashbox { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 14px 0; }
+    .cashbox div { padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
+    .cashbox span { display: block; color: var(--muted); font-size: .85rem; }
+    .cashbox strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+    .scroll { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+    th, td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+    th { background: var(--blue-pale); color: var(--blue); }
+    .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    tr.total td { font-weight: 700; background: #f3f8ee; }
+
+    /* reflection */
+    #panel-reflection h3 { margin-top: 34px; padding-top: 6px; border-top: 2px solid var(--blue-pale); }
+    #panel-reflection h4 { margin: 20px 0 4px; font-size: 1.02rem; color: var(--blue); }
+    .lede { font-size: 1.12rem; line-height: 1.6; padding: 14px 18px; border-left: 4px solid var(--blue); background: var(--blue-pale); border-radius: 0 10px 10px 0; }
+    .goto { color: var(--blue); font-weight: 700; text-decoration: underline dotted; cursor: pointer; }
+    .grade { display: inline-block; min-width: 2.2em; text-align: center; padding: 1px 8px; border-radius: 999px; background: #d9f0e3; color: #17704a; font-weight: 800; }
+    .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; margin: 16px 0 4px; }
+    .bars { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
+    .bhead { font-weight: 700; font-size: .88rem; margin-bottom: 8px; }
+    .brow { display: grid; grid-template-columns: 112px 1fr 56px; gap: 8px; align-items: center; margin: 5px 0; font-size: .82rem; }
+    .btrack { height: 12px; border-radius: 99px; background: #e2e8ef; overflow: hidden; }
+    .bfill { display: block; height: 100%; border-radius: 99px; background: #6b7a8c; }
+    .b-boss { background: #c9a24b; } .b-inventory { background: #d9822b; } .b-accounting { background: #3f9a73; }
+    .b-facilities { background: #5f86a8; } .b-customer_service { background: #cf6384; }
+    .bnum { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+    .pull { font-size: 1.1rem; line-height: 1.6; padding: 16px 20px; border: 2px solid var(--blue); border-radius: 12px; background: #f6fafe; }
+
+    .evidence { margin: 14px 0 22px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--wash); }
+    .evidence .cap { margin: 0 0 8px; font-size: .9rem; color: var(--muted); }
+    .nav { margin-top: -6px; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <h1>Campus Customs Ticket Desk</h1>
+      <p class="subtitle">Problem 6 plan beside the Problem 9 results. Open this file directly in a browser; it has no external dependencies.</p>
+    </header>
+
+    <p class="notice"><strong>Plan versus results:</strong> The Expected sections are the Problem 6 plan, unchanged. The Actual sections and the Cash tab were filled from the real run in Problem 9, built from <code>output/audit_trail.json</code> and the working database.</p>
+
+    <nav class="tabs" role="tablist" aria-label="Ticket desk sections">
+      <button class="tab" id="tab-101" role="tab" aria-selected="true" aria-controls="panel-101" tabindex="0">Ticket 101</button>
+      <button class="tab" id="tab-102" role="tab" aria-selected="false" aria-controls="panel-102" tabindex="-1">Ticket 102</button>
+      <button class="tab" id="tab-103" role="tab" aria-selected="false" aria-controls="panel-103" tabindex="-1">Ticket 103</button>
+      <button class="tab" id="tab-cash" role="tab" aria-selected="false" aria-controls="panel-cash" tabindex="-1">Cash</button>
+      <button class="tab" id="tab-reflection" role="tab" aria-selected="false" aria-controls="panel-reflection" tabindex="-1">Reflection</button>
+    </nav>
+
+    <section class="panel" id="panel-101" role="tabpanel" aria-labelledby="tab-101">
+      <h2>Ticket 101 - Bulldog tee order</h2>
+      <p><span class="tag">Customer order</span> One white Bulldog tee, size S. MCP shows zero in stock. The linked Bulldog Print Co invoice is open for $840 and past due relative to the shop date; the vendor tool flags an open invoice as a shipping block.</p>
+
+      <h3>Expected</h3>
+      <p><strong>Who the Boss should call first:</strong> Inventory, because the first decision is whether the requested tee can be supplied now and what the recorded vendor/shipping constraints are. There is no stock in the exact size, so the Boss should not promise fulfillment.</p>
+      <p><strong>Expected delegations, in order:</strong></p>
+      <ol>
+        <li><strong>Inventory first:</strong> confirm the exact SKU and size quantity, then check recorded vendor specialty, lead time, and the invoice shipping block.</li>
+        <li><strong>Accounting next:</strong> verify the linked invoice, due date, and cash picture; advise whether a human payment decision might be needed. Accounting should not initiate payment approval.</li>
+        <li><strong>Customer Service last:</strong> after those facts are known, prepare a brief unsent draft that acknowledges the stock issue without promising a restock or delivery date.</li>
+      </ol>
+      <p>I would not delegate to Facilities; this ticket has no lease or premises issue.</p>
+      <p><strong>Expected MCP tools:</strong> shared <code>list_open_tickets()</code> once for the batch; Boss <code>get_ticket_details(101)</code>; Inventory <code>get_ticket_details(101)</code>, <code>check_inventory("CC-TEE-WHITE", "S")</code>, and <code>list_vendors_with_shipping_status()</code>; Accounting <code>get_ticket_details(101)</code> and <code>get_shop_financial_status()</code>; Customer Service <code>get_ticket_details(101)</code>, <code>check_inventory("CC-TEE-WHITE", "S")</code>, and <code>save_customer_draft(101, ...)</code>. Relevant agents may use <code>append_ticket_note</code>. The Boss should call <code>request_payment_approval(101)</code> only if the verified facts support asking a human about the linked invoice; it never pays. Otherwise, the Boss can leave the ticket blocked and explain why.</p>
+
+      <h3>Actual (from the real run)</h3>
+      <div class="actual filled"><p><strong>Real run:</strong> run id <code>dd5b37e5-c8e0-4596-9c08-3f1e6843f2c9</code>, started 2026-10-14 16:01:45 UTC. Every step is in <code>output/audit_trail.json</code>.</p><p><strong>Agents that worked, in order:</strong> Boss → Accounting → Customer Service → Inventory. <strong>Not called:</strong> Facilities.</p><p><strong>Delegations:</strong></p><ul><li>Boss asked Accounting: “Ticket 101: verify only linked invoice 501&#x27;s recorded status/due date/amount and available cash from MCP records, and whether cash covers the invoice. Return exact evidence, no payment or approval.”</li><li>Boss asked Customer Service: “Ticket 101 customer order: once checking linked stock and price facts, create an unsent customer reply draft request for the item only if available verified facts suffice. Do not send. Report what was saved.”</li><li>Boss asked Inventory: “Ticket 101: check inventory for SKU CC-TEE-WHITE, size S, and shipping/vendor status for linked vendor 1 Bulldog Print Co if those are available. Return exact MCP-recorded stock and shipment eligibility evidenc…”</li></ul><p><strong>Tools used:</strong></p><ul><li><strong>Boss:</strong> list_open_tickets(), get_ticket_details(ticket 101), get_shop_financial_status(), request_payment_approval(ticket 101), append_ticket_note(ticket 101), update_ticket_status(awaiting_human_approval)</li><li><strong>Accounting:</strong> get_ticket_details(ticket 101), get_shop_financial_status()</li><li><strong>Customer Service:</strong> get_ticket_details(ticket 101), check_inventory(CC-TEE-WHITE, S)</li><li><strong>Inventory:</strong> get_ticket_details(ticket 101), check_inventory(CC-TEE-WHITE, S), list_vendors_with_shipping_status()</li></ul><p><strong>Boss's conclusion:</strong> Ticket reviewed against MCP records. The requested tee is out of stock, and the linked vendor cannot ship new products while invoice 501 remains open and unpaid. Invoice 501 is $840, past due as of shop date 2026-08-31; available cash is $3,400. A human payment approval request was filed; no payment was made. No customer draft was saved.</p><p><strong>Human approvals and decisions:</strong></p><ul><li>Tom (approved in chat) approved $840.00 (invoice); checking became $160.00</li><li>Tom (decided in chat) closed the ticket: Invoice 501 ($840) to Bulldog Print Co was paid with human approval, so that vendor is no longer blocked from shipping (5-day lead time, not a guaranteed delivery date). The size S tee is still out of stock (0) and no customer message was drafted or sent, so ordering the restock and replying to the customer are manual follow-ups.</li></ul><p><strong>Final status:</strong> <span class="tag ok">resolved</span></p><p><strong>Plan versus actual:</strong></p><ul><li><strong>Matched:</strong> Facilities was not called. Inventory checked the exact SKU and size (0 in stock) and the vendor shipping block, Accounting read the invoice and cash, and the Boss filed a payment request for invoice 501 but never paid it.</li><li><strong>Different:</strong> The Boss called Accounting first, then Customer Service, then Inventory. The plan was Inventory first, Accounting next, Customer Service last.</li><li><strong>Different:</strong> Customer Service did not save a draft (the plan expected save_customer_draft); it only reported that nothing could be promised.</li><li><strong>After the run:</strong> A human approved the $840.00 payment, which moved the ticket to in progress, and then a human closed it with a written note. The agents never resolved it themselves.</li></ul></div>
+    </section>
+
+    <section class="panel" id="panel-102" role="tabpanel" aria-labelledby="tab-102" hidden>
+      <h2>Ticket 102 - Rent due</h2>
+      <p><span class="tag">Rent notice</span> Lease 1 lists monthly rent of $2,400 due 2026-09-02. MCP gives the shop date as 2026-08-31 and available cash as $3,400. The database does not state a grace period or whether a payment has already been arranged.</p>
+
+      <h3>Expected</h3>
+      <p><strong>Who the Boss should call first:</strong> Facilities, because it should verify the linked lease and explain exactly what the rent notice and lease record establish, including what remains unknown.</p>
+      <p><strong>Expected delegations, in order:</strong></p>
+      <ol>
+        <li><strong>Facilities first:</strong> inspect the ticket and linked lease; compare the listed due date with the shop date and flag missing terms. Do not contact the landlord.</li>
+        <li><strong>Accounting next:</strong> check the recorded rent, shop date, cash, and payment history, then advise the Boss about the human decision. Accounting must not make or approve payment.</li>
+      </ol>
+      <p>I would not call Inventory or Customer Service; neither stock nor a customer response is part of this rent ticket.</p>
+      <p><strong>Expected MCP tools:</strong> shared <code>list_open_tickets()</code> once for the batch; Boss <code>get_ticket_details(102)</code>; Facilities <code>get_ticket_details(102)</code>; Accounting <code>get_shop_financial_status()</code>. Use <code>append_ticket_note</code> for factual findings. If the Boss decides a human should authorize the rent payment, use <code>request_payment_approval(102)</code>; that only records the request and changes the ticket to awaiting human approval. Otherwise the Boss should leave a clear note and choose a justified status with <code>update_ticket_status</code>.</p>
+
+      <h3>Actual (from the real run)</h3>
+      <div class="actual filled"><p><strong>Real run:</strong> run id <code>451c9c21-b91b-4e93-b0e4-15381fbcb3da</code>, started 2026-10-14 16:02:07 UTC. Every step is in <code>output/audit_trail.json</code>.</p><p><strong>Agents that worked, in order:</strong> Boss → Accounting → Facilities. <strong>Not called:</strong> Inventory, Customer Service.</p><p><strong>Delegations:</strong></p><ul><li>Boss asked Accounting: “For ticket 102 only: verify the linked rent lease 1 amount and due status against accounting records, available cash, and whether payment approval should be requested under the recorded facts. Return exact evid…”</li><li>Boss asked Facilities: “For ticket 102 only: verify linked lease 1 terms and next due date against facilities/lease records; return exact recorded evidence, no assumptions.”</li></ul><p><strong>Tools used:</strong></p><ul><li><strong>Boss:</strong> list_open_tickets(), get_ticket_details(ticket 102), get_shop_financial_status(), request_payment_approval(ticket 102), append_ticket_note(ticket 102), update_ticket_status(awaiting_human_approval)</li><li><strong>Accounting:</strong> get_ticket_details(ticket 102), get_shop_financial_status()</li><li><strong>Facilities:</strong> get_ticket_details(ticket 102), get_shop_financial_status()</li></ul><p><strong>Boss's conclusion:</strong> Verified ticket 102 and linked lease 1. Rent is $2,400 due 2026-09-02; the shop date is 2026-08-31, so it is not yet overdue. Available cash is $3,400 and no rent payment is recorded. A $2,400 rent payment approval request was recorded; no payment was made.</p><p><strong>Human approvals and decisions:</strong></p><ul><li>Tom (approved in chat) approved $2,400.00 (rent); checking became $1,000.00</li><li>The approved payment resolved the ticket; no separate close step was needed.</li></ul><p><strong>Final status:</strong> <span class="tag ok">resolved</span></p><p><strong>Plan versus actual:</strong></p><ul><li><strong>Matched:</strong> Inventory and Customer Service were not called. The Boss filed a payment request for the $2,400.00 rent and never paid it.</li><li><strong>Different:</strong> The Boss called Accounting first, then Facilities. The plan was Facilities first, then Accounting.</li><li><strong>Different:</strong> Facilities also read the financial status (the plan listed only get_ticket_details for it).</li><li><strong>After the run:</strong> A human approved the rent payment, and the payment step resolved the ticket.</li></ul></div>
+    </section>
+
+    <section class="panel" id="panel-103" role="tabpanel" aria-labelledby="tab-103" hidden>
+      <h2>Ticket 103 - Bulk hoodie discount</h2>
+      <p><span class="tag">Price override</span> The request is for 20 navy hoodies, size M. MCP shows 8 in stock; recorded unit cost is $22 and list price is $58. No discount rule is present in the records.</p>
+
+      <h3>Expected</h3>
+      <p><strong>Who the Boss should call first:</strong> Inventory, because the request is for more than the exact size currently in stock, and the Boss should learn whether any recorded vendor information changes that constraint before discussing fulfillment.</p>
+      <p><strong>Expected delegations, in order:</strong></p>
+      <ol>
+        <li><strong>Inventory first:</strong> confirm the requested quantity versus exact stock and check relevant vendor specialties, lead times, and shipping blocks. Do not promise that any vendor can supply the hoodies.</li>
+        <li><strong>Accounting next:</strong> review the recorded cost and list price and explain the arithmetic, while clearly stating that no discount policy or approval is in the database.</li>
+        <li><strong>Customer Service last:</strong> prepare an unsent, noncommittal reply for human review; do not offer a discount or promise 20 units.</li>
+      </ol>
+      <p>I would not delegate to Facilities; there is no lease or premises issue. I also would not ask Accounting to invent or choose a discount rate.</p>
+      <p><strong>Expected MCP tools:</strong> shared <code>list_open_tickets()</code> once for the batch; Boss <code>get_ticket_details(103)</code>; Inventory <code>get_ticket_details(103)</code>, <code>check_inventory("CC-HOOD-NAVY", "M")</code>, and, if restock is relevant, <code>list_vendors_with_shipping_status()</code>; Accounting <code>get_ticket_details(103)</code> for recorded prices; Customer Service <code>get_ticket_details(103)</code>, <code>check_inventory("CC-HOOD-NAVY", "M")</code>, and <code>save_customer_draft(103, ...)</code>. Use <code>append_ticket_note</code> for evidence. The Boss should use <code>update_ticket_status</code> only to record a justified state, likely blocked pending a human pricing/fulfillment decision; do not use a payment tool for this request.</p>
+
+      <h3>Actual (from the real run)</h3>
+      <div class="actual filled"><p><strong>Real run:</strong> run id <code>77128df2-b90e-4c9a-958d-52bbe6e85985</code>, started 2026-10-14 16:02:18 UTC. Every step is in <code>output/audit_trail.json</code>.</p><p><strong>Agents that worked, in order:</strong> Boss → Inventory → Accounting → Customer Service. <strong>Not called:</strong> Facilities.</p><p><strong>Delegations:</strong></p><ul><li>Boss asked Inventory: “Ticket 103 only. Verify stock availability for SKU CC-HOOD-NAVY size M quantity 20 from MCP inventory records; report exact evidence, no guessing.”</li><li>Boss asked Accounting: “Ticket 103 only. Check whether any recorded pricing/discount policy or applicable approval facts exist for the 20-hoodie bulk price request. Provide exact MCP evidence; do not infer policy or approve discount.”</li><li>Boss asked Customer Service: “Ticket 103 only. Using the recorded ticket, current available quantity (inventory agent confirms 8), list price $58 and cost $22, assess whether to save a clearly labeled unsent response draft. Do not invent a …”</li></ul><p><strong>Tools used:</strong></p><ul><li><strong>Boss:</strong> list_open_tickets(), get_ticket_details(ticket 103), get_shop_financial_status(), append_ticket_note(ticket 103), update_ticket_status(awaiting_human_approval)</li><li><strong>Inventory:</strong> get_ticket_details(ticket 103), check_inventory(CC-HOOD-NAVY, M)</li><li><strong>Accounting:</strong> get_ticket_details(ticket 103), get_shop_financial_status()</li><li><strong>Customer Service:</strong> get_ticket_details(ticket 103), save_customer_draft(ticket 103)</li></ul><p><strong>Refused tool calls:</strong> Boss → update_ticket_status: Error executing tool update_ticket_status: Use request_payment_approval to record a human approval request and set this status.</p><p><strong>Boss's conclusion:</strong> Verified the ticket and relevant linked facts with MCP. The request is for 20 CC-HOOD-NAVY hoodies, size M; inventory shows 8 available, leaving a shortfall of 12. Recorded list price is $58/unit and unit cost is $22; no bulk-discount terms or approval are recorded. A clearly labeled unsent customer draft and a factual ticket note were saved. No message was sent and no payment was made.</p><p><strong>Human approvals and decisions:</strong></p><ul><li>Tom (decided in chat) closed the ticket: Human decision: no discount, because no discount policy is recorded. The club can be offered only the 8 navy size M hoodies in stock at the list price of $58.00; the other 12 would need a restock. No cash moves. Customer Service&#x27;s saved draft is unsent and still says a price exception is being checked, so it must be updated before anyone sends it.</li></ul><p><strong>Final status:</strong> <span class="tag ok">resolved</span></p><p><strong>Plan versus actual:</strong></p><ul><li><strong>Matched:</strong> Inventory, Accounting, then Customer Service, in the planned order. Facilities was not called, no payment tool was used, and Customer Service saved an unsent draft.</li><li><strong>Different:</strong> Customer Service did not call check_inventory (the plan listed it). The Boss tried to set the ticket to awaiting_human_approval; the tool refused because only a payment request can set that, so the ticket stayed open after the run.</li><li><strong>After the run:</strong> A human decided to decline the discount and closed the ticket with a written note. No cash moved.</li></ul></div>
+    </section>
+
+    <section class="panel" id="panel-cash" role="tabpanel" aria-labelledby="tab-cash" hidden>
+      <h2>Cash</h2>
+      <p>All figures come from the real run after a reset, read from the working database <code>data/campus_customs_new.db</code>.</p>
+      <div class="cashbox">
+        <div><span>Starting checking balance</span><strong>$3,400.00</strong></div>
+        <div><span>Paid out</span><strong>−$3,240.00</strong></div>
+        <div><span>Ending checking balance</span><strong>$160.00</strong></div>
+      </div>
+      <h3>Itemized, in the order cash moved</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Step</th><th>Ticket</th><th>Money event</th><th class="num">Cash change</th><th class="num">Checking after</th><th>Why</th></tr></thead>
+        <tbody><tr><td>Start</td><td>—</td><td>Working database reset from <code>data/campus_customs.db</code></td><td class="num">—</td><td class="num">$3,400.00</td><td>Starting checking balance after the reset.</td></tr><tr><td>Ticket 102 resolved</td><td>Rent due</td><td>Rent payment to Elm City Properties (lease 1)</td><td class="num">−$2,400.00</td><td class="num">$1,000.00</td><td>Rent was due 2026-09-02, two days after the shop date 2026-08-31, and Accounting confirmed the $3,400.00 in checking covered it.</td></tr><tr><td>Ticket 101 resolved</td><td>Bulldog tee</td><td>Vendor invoice 501 to Bulldog Print Co</td><td class="num">−$840.00</td><td class="num">$160.00</td><td>The invoice was 3 days past due and blocked that vendor from shipping; paying it was the human decision that lets the out-of-stock size S tee be reordered.</td></tr><tr><td>Ticket 103 resolved</td><td>Bulk hoodie discount</td><td>No payment</td><td class="num">$0.00</td><td class="num">$160.00</td><td>The discount was declined by the human, and the 12 missing hoodies were not purchased, so nothing was paid out.</td></tr><tr class="total"><td>End</td><td>—</td><td>Ending checking balance</td><td class="num">−$3,240.00</td><td class="num">$160.00</td><td>Matches <code>cash_accounts</code> in <code>data/campus_customs_new.db</code>.</td></tr></tbody>
+      </table></div>
+      <h3>Check</h3>
+      <p><code>$3,400.00 − $2,400.00 (ticket 102) − $840.00 (ticket 101) − $0.00 (ticket 103) = $160.00</code>, and <code>cash_accounts</code> in the working database also shows <strong>$160.00</strong>.</p>
+      <h3>Rows in the <code>payments</code> table</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>id</th><th>kind</th><th>reference</th><th class="num">amount</th><th>paid on (shop date)</th><th>approved by</th></tr></thead>
+        <tbody><tr><td>1</td><td>rent</td><td>1</td><td class="num">$2,400.00</td><td>2026-08-31</td><td>Tom (approved in chat)</td></tr><tr><td>2</td><td>invoice</td><td>501</td><td class="num">$840.00</td><td>2026-08-31</td><td>Tom (approved in chat)</td></tr></tbody>
+      </table></div>
+      <p class="hint">Cash only goes out in this homework: no revenue is modeled, so the 8 hoodies offered on ticket 103 do not add cash.</p>
+    </section>
+
+    <section class="panel" id="panel-reflection" role="tabpanel" aria-labelledby="tab-reflection" hidden>
+      <h2>HW 5 Reflection</h2>
+      <p class="hint nav">Evidence on this page: <a href="#" class="goto" data-tab="tab-101">Ticket 101</a> · <a href="#" class="goto" data-tab="tab-102">Ticket 102</a> · <a href="#" class="goto" data-tab="tab-103">Ticket 103</a> · <a href="#" class="goto" data-tab="tab-cash">Cash</a></p>
+      <h3>How I would grade the agents and why</h3>
+      <p>Overall, I think the agents did a good job finding the information needed for the three tickets and following the limits set for them. However, getting the information right did not always mean that the issue was fully handled. In some cases, I still had to make the decision or finish the response myself. The shop started with $3,400 and ended with $160 after paying the rent and the vendor invoice.</p>
+      <p>To evaluate the agents, I looked at whether their information was accurate, whether the Boss chose the relevant agents, whether they stayed within their permissions, and whether their work gave me something I could act on. I also considered how many tokens, tool calls, and seconds each ticket required.</p>
+      <div class="evidence"><p class="cap"><strong>Scorecard</strong> (1 to 5 on each thing I looked at: accurate information, right agents chosen, stayed within permissions, usable result, cost)</p><div class="scroll"><table><thead><tr><th>Ticket</th><th class="num">Facts</th><th class="num">Casting</th><th class="num">Lane</th><th class="num">Hand-off</th><th class="num">Cost</th><th class="num">Overall</th></tr></thead><tbody><tr><td><strong>101 Bulldog tee</strong></td><td class="num">5/5</td><td class="num">5/5</td><td class="num">5/5</td><td class="num">4/5</td><td class="num">3/5</td><td class="num"><span class="grade">B+</span> <small>4.4</small></td></tr><tr><td><strong>102 Rent due</strong></td><td class="num">5/5</td><td class="num">5/5</td><td class="num">5/5</td><td class="num">5/5</td><td class="num">4/5</td><td class="num"><span class="grade">A</span> <small>4.8</small></td></tr><tr><td><strong>103 Hoodie discount</strong></td><td class="num">5/5</td><td class="num">5/5</td><td class="num">5/5</td><td class="num">3/5</td><td class="num">3/5</td><td class="num"><span class="grade">B</span> <small>4.2</small></td></tr></tbody></table></div></div>
+      <p>For ticket 101, the Bulldog tee, I would give the team a B+. Inventory correctly found that there were no size S tees available and that Bulldog Print Co was blocked because of an unpaid invoice. Accounting identified invoice 501 for $840, due on August 28, 2026, which was three days overdue. It also checked that the $3,400 balance was enough to cover the invoice, leaving $2,560 if that payment was considered by itself. The Boss then created the payment request for the correct amount.</p>
+      <p>The Boss involved Accounting, Customer Service, and Inventory, which made sense. There was no reason to involve Facilities. However, Customer Service did not save a draft, so the customer still needed a response. The run also used 27,377 tokens, took 21 seconds, and made 13 tool calls. Around 65% of those tokens were used by the Boss, and the ticket details were read four separate times. For a relatively simple question, this seems like a lot of repeated work.</p>
+      <p>For ticket 102, the rent payment, I would give the team an A. The Boss involved Accounting and Facilities, and the run ended with a request for me to approve the $2,400 payment. Accounting calculated that paying the rent from the initial $3,400 would leave $1,000, but it did not treat having enough money as permission to pay. I think this was an important part of the design because I still had control over the actual payment.</p>
+      <p>This was the fastest and least expensive run in terms of tokens. It took 10 seconds, used 19,469 tokens, and made 10 tool calls. Still, there was unnecessary repetition. The ticket details and financial information were each read three times, even though the information was the same.</p>
+      <p>For ticket 103, the hoodie discount request, I would give the team a B. The customer wanted 20 hoodies, but there were only 8 available, meaning the shop was short by 12. Accounting found that the list price was $58 and the unit cost was $22. There was no discount policy in the database, so the agents correctly avoided making up a discount or assuming they could approve one.</p>
+      <p>The problem was that the team could not take the request much further. The Boss said that the approval process for a price override was unclear. It also tried to change the ticket status to “awaiting human approval,” but the tool rejected this because that status required an actual payment request. The Boss reported the failure correctly, but I still had to write the resolution myself. The saved customer draft said the request was being checked, which no longer reflected the situation after I decided to decline it. This run used 24,455 tokens, took 18 seconds, and made 11 tool calls.</p>
+      <p>Looking at the agents individually, Accounting was the most consistent. It got the figures right across all three tickets and never made a payment itself. Inventory also performed well, although its performance depended on how specific its instructions were. In the first dry run, it skipped the vendor check for ticket 101. Adding a sentence to its prompt fixed that.</p>
+      <p>Facilities provided the correct information, but much of its work overlapped with Accounting. Customer Service was less consistent because it saved a draft for ticket 103 but not for ticket 101. This matters because its work would eventually be seen by the customer. The Boss generally coordinated the relevant agents correctly, but it used around 67% of the total 71,301 tokens across the three runs.</p>
+      <div class="evidence"><p class="cap"><strong>Tokens per agent, per ticket</strong>, from <code>output/audit_trail.json</code> (the Boss bars are the long ones)</p><div class="charts"><div class="bars"><div class="bhead">Ticket 101: 27,377 tokens · 21 s · 13 tool calls</div><div class="brow"><span class="blabel">Boss</span><span class="btrack"><span class="bfill b-boss" style="width:100%"></span></span><span class="bnum">17,673</span></div><div class="brow"><span class="blabel">Accounting</span><span class="btrack"><span class="bfill b-accounting" style="width:14%"></span></span><span class="bnum">2,551</span></div><div class="brow"><span class="blabel">Customer Service</span><span class="btrack"><span class="bfill b-customer_service" style="width:19%"></span></span><span class="bnum">3,353</span></div><div class="brow"><span class="blabel">Inventory</span><span class="btrack"><span class="bfill b-inventory" style="width:22%"></span></span><span class="bnum">3,800</span></div></div><div class="bars"><div class="bhead">Ticket 102: 19,469 tokens · 10 s · 10 tool calls</div><div class="brow"><span class="blabel">Boss</span><span class="btrack"><span class="bfill b-boss" style="width:81%"></span></span><span class="bnum">14,356</span></div><div class="brow"><span class="blabel">Accounting</span><span class="btrack"><span class="bfill b-accounting" style="width:15%"></span></span><span class="bnum">2,700</span></div><div class="brow"><span class="blabel">Facilities</span><span class="btrack"><span class="bfill b-facilities" style="width:14%"></span></span><span class="bnum">2,413</span></div></div><div class="bars"><div class="bhead">Ticket 103: 24,455 tokens · 18 s · 11 tool calls</div><div class="brow"><span class="blabel">Boss</span><span class="btrack"><span class="bfill b-boss" style="width:89%"></span></span><span class="bnum">15,663</span></div><div class="brow"><span class="blabel">Inventory</span><span class="btrack"><span class="bfill b-inventory" style="width:13%"></span></span><span class="bnum">2,355</span></div><div class="brow"><span class="blabel">Accounting</span><span class="btrack"><span class="bfill b-accounting" style="width:15%"></span></span><span class="bnum">2,640</span></div><div class="brow"><span class="blabel">Customer Service</span><span class="btrack"><span class="bfill b-customer_service" style="width:21%"></span></span><span class="bnum">3,797</span></div></div></div></div>
+      <h3>What happened compared with what I expected</h3>
+      <p>I correctly predicted which agents would be involved in each ticket, but I did not always predict the order in which they would work. At first, I thought the order was a minor detail. After seeing the results, I think it can affect whether an agent has enough information to complete its task.</p>
+      <p>For ticket 101, I expected Inventory to go first, followed by Accounting and Customer Service. The actual order was Boss, Accounting, Customer Service, and then Inventory. This meant Customer Service worked before Inventory had reported its findings. It did not save a draft and said it could not make promises to the customer. I cannot say for sure that the order caused this, but it seems more useful to have Customer Service write after the other agents have collected the relevant information.</p>
+      <p>For ticket 102, I expected Facilities to go before Accounting, but the actual order was Boss, Accounting, and Facilities. The correct agents were involved, and the Boss created the expected payment request. Facilities also checked the financial information, which I had not expected and which repeated some of Accounting’s work.</p>
+      <p>Ticket 103 was closest to my prediction. The order was Boss, Inventory, Accounting, and Customer Service. Facilities was not involved, and no payment was requested. What I did not predict was the failed attempt to change the status to “awaiting human approval.” The ticket remained open until I closed it manually.</p>
+      <p>There were also a few things I had not considered in my original plan. In the first dry run of the rent ticket, the Boss said that a human decision was needed but did not actually create a payment request. This meant there was nothing for me to approve until I explicitly instructed it to create one. So telling the human that approval is needed is not necessarily enough. The agent also needs to take the step that makes approval possible.</p>
+      <p>Another thing I realized was that the tickets could not really be considered separately. The rent payment reduced the balance from $3,400 to $1,000, and the $840 invoice payment reduced it further to $160. Ticket 103 involved no payment. Buying the 12 missing hoodies would cost 12 × $22 = $264, which was $104 more than the remaining balance. I had planned the tickets individually, but they all depended on the same limited amount of money.</p>
+      <h3>What would have been simpler with one agent and tools</h3>
+      <p>I think most of the information gathering could have been done more simply by one agent with access to the relevant tools. Across the three tickets, the team used 71,301 tokens and made 34 tool calls. A lot of this involved different agents reading the same information.</p>
+      <p>For example, ticket 102 mainly required reading the ticket, which included the lease information, and checking the shop’s finances. Instead, the ticket details and financial snapshot were each read three times. Similarly, on ticket 101, four agents opened the same ticket. Inventory, Accounting, and Facilities had different instructions, but much of their work involved using the same tools to read information.</p>
+      <p>There were also technical problems with getting the agents to work together. The first real run failed because of a 2,500-token limit. Another problem occurred when the Boss could not change the ticket status because a required argument was missing. From this experience, a lot of the difficulty came from connecting the agents and tools properly.</p>
+      <p>I would probably combine Inventory, Accounting, and Facilities into one agent that gathers the information. I would keep Customer Service separate to prepare customer drafts once the facts are available. I would also keep clear restrictions on which agent can change ticket statuses.</p>
+      <p>Most importantly, I would keep human approval for payments. The $2,400 rent and $840 invoice were paid because a person approved them. I think this is particularly important when the business has so little cash available.</p>
+      <p>For these three tickets, a simpler setup would probably be enough: one main agent to gather information and coordinate the work, a separate agent to write customer responses, and a human to approve payments. The five-agent setup helped me understand the different roles, but I am not convinced that all five were necessary for these tasks.</p>
+      <h3>Three additional problems the team could already handle</h3>
+      <p>One example would be a customer asking for a crest mug. The database shows that CC-MUG-CREST has no stock available. Elm City Gifts supplies mugs and small goods, has a three-day lead time, and has no open invoice blocking it. Inventory could identify the stock shortage and check the vendor, and Customer Service could draft a response explaining the expected lead time without guaranteeing it. A human would still need to place the order. This would be similar to ticket 101, but without the unpaid invoice preventing progress.</p>
+      <p>A second example would be a customer asking for 10 blue hats. The shop has 40 hats available, with a unit cost of $6 and a list price of $22. Inventory could confirm that there is enough stock, and Accounting could calculate the $16 difference between the price and unit cost, or $160 for 10 hats before other expenses. Customer Service could then prepare a draft confirming availability and the normal price. Since no discount or restocking would be needed, this should be more straightforward than ticket 103.</p>
+      <p>A third example would be the next rent payment. After the previous payment, the next due date for lease 1 became October 2, 2026, and the rent remained $2,400. If the cash balance were still $160, the payment request would be refused because there would not be enough money. The team could identify and report the problem, although it could not solve the cash shortage itself.</p>
+      <h3>Three problems the team could not solve and what I would add</h3>
+      <p>The first problem is actually restocking products. For ticket 101, the shop needed a size S tee, and for ticket 103, it needed another 12 hoodies. The existing tools could identify the shortages and check vendors, but they could not create a purchase order or record newly received stock. Even after paying the $840 invoice to unblock the tee vendor, someone still had to place the order manually. The tee itself cost $8 and had a list price of $28.</p>
+      <p>I would add tools to create purchase orders and record stock when it arrives. A Purchasing agent could check the vendor’s products, lead time, and outstanding invoices, then prepare an order for human approval. I would also add a check on how the purchase would affect the money needed for upcoming rent. The system should show clearly when an order is unaffordable, such as the $264 hoodie order with only $160 remaining.</p>
+      <p>The second problem is tracking incoming cash and planning for future expenses. The current setup records money going out, but it does not include sales coming in. With only $160 left, the shop is $2,240 short of the next $2,400 rent payment. Even selling all 8 available hoodies at $58 would bring in only $464. This would increase the balance to $624, still leaving a shortage of $1,776.</p>
+      <p>I would add a sales or orders table, a tool to record sales, and a tool to forecast the cash balance over a chosen period. A Controller agent could review expected income and expenses before the Boss prepares payment requests. This would help the human see the effect of approving a payment on the next few weeks of operations.</p>
+      <p>The third problem is handling decisions that require a policy or communication with someone outside the shop. Ticket 103 showed this clearly. The agents knew the stock, price, and cost, but they had no policy telling them whether an order of 20 hoodies qualified for a discount. They also could not send the draft to the customer.</p>
+      <p>I would add a pricing policy with clear discount rules and a tool that allows the agents to check them. A Pricing agent could apply discounts within those rules and ask for approval for exceptions. I would also add an email tool that requires a human to approve sending, along with an inbox tool that can turn incoming messages into tickets.</p>
+      <p>The same communication tools could help with the landlord and vendors. For example, an agent could draft a request for a payment extension or payment plan, which a human would review before sending. This would give the team a way to help address the cash shortage beyond simply reporting that there is not enough money.</p>
+      <p>My main takeaway is that the agents were useful for gathering accurate information and preparing actions, but the overall process still needed human judgment. The shop could pay the rent and the outstanding invoice, but doing both left too little money to restock the missing hoodies. I would want the next version to make that connection clearer before asking me to approve payments. I would also simplify the repeated information gathering and give the system better tools for purchasing, sales, and cash planning.</p>
+    </section>
+  </main>
+  <script>
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+    function activate(tab, moveFocus = false) {
+      for (const item of tabs) {
+        const selected = item === tab;
+        item.setAttribute('aria-selected', String(selected));
+        item.tabIndex = selected ? 0 : -1;
+      }
+      for (const panel of panels) panel.hidden = panel.id !== tab.getAttribute('aria-controls');
+      if (moveFocus) tab.focus();
+    }
+    for (const tab of tabs) {
+      tab.addEventListener('click', () => activate(tab));
+      tab.addEventListener('keydown', event => {
+        const index = tabs.indexOf(tab);
+        let next = null;
+        if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+        if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+        if (event.key === 'Home') next = tabs[0];
+        if (event.key === 'End') next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); activate(next, true); }
+      });
+    }
+  </script>
+<script>
+    document.querySelectorAll('.goto').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.getElementById(a.dataset.tab).click();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+{
+  "generated_utc": "2026-10-14T16:09:02+00:00",
+  "database": "data/campus_customs_new.db",
+  "note": "Built from output/audit_trail.json and the working database after a reset; every figure below was read from them.",
+  "starting_checking_balance": 3400.0,
+  "ending_checking_balance": 160.0,
+  "payments": [
+    {
+      "id": 1,
+      "kind": "rent",
+      "reference_id": 1,
+      "amount": 2400.0,
+      "account": "checking",
+      "paid_at": "2026-08-31",
+      "approved_by": "Tom (approved in chat)"
+    },
+    {
+      "id": 2,
+      "kind": "invoice",
+      "reference_id": 501,
+      "amount": 840.0,
+      "account": "checking",
+      "paid_at": "2026-08-31",
+      "approved_by": "Tom (approved in chat)"
+    }
+  ],
+  "tickets": [
+    {
+      "id": 101,
+      "subject": "Bulldog tee",
+      "final_status": "resolved",
+      "outcome": "Invoice 501 ($840.00) to Bulldog Print Co paid on human approval, so the vendor can ship again; the size S tee is still out of stock, so restocking and replying to the customer are manual follow-ups.",
+      "run_id": "dd5b37e5-c8e0-4596-9c08-3f1e6843f2c9",
+      "run_started_utc": "2026-10-14T16:01:45.828+00:00",
+      "cash_change": -840.0,
+      "agents_called": [
+        "boss",
+        "accounting",
+        "customer_service",
+        "inventory"
+      ],
+      "agents_not_called": [
+        "facilities"
+      ],
+      "delegations": [
+        {
+          "from": "boss",
+          "to": "accounting",
+          "task": "Ticket 101: verify only linked invoice 501's recorded status/due date/amount and available cash from MCP records, and whether cash covers the invoice. Return exact evidence, no payment or approval."
+        },
+        {
+          "from": "boss",
+          "to": "customer_service",
+          "task": "Ticket 101 customer order: once checking linked stock and price facts, create an unsent customer reply draft request for the item only if available verified facts suffice. Do not send. Report what was saved."
+        },
+        {
+          "from": "boss",
+          "to": "inventory",
+          "task": "Ticket 101: check inventory for SKU CC-TEE-WHITE, size S, and shipping/vendor status for linked vendor 1 Bulldog Print Co if those are available. Return exact MCP-recorded stock and shipment eligibility evidence only; do not infer."
+        }
+      ],
+      "agents": [
+        {
+          "agent": "boss",
+          "asked_by": null,
+          "contribution": "Ticket reviewed against MCP records. The requested tee is out of stock, and the linked vendor cannot ship new products while invoice 501 remains open and unpaid. Invoice 501 is $840, past due as of shop date 2026-08-31; available cash is $3,400. A human payment approval request was filed; no payment was made. No customer draft was saved.",
+          "findings": [
+            "Order: 1 CC-TEE-WHITE, size S; recorded stock is 0.",
+            "Invoice 501: Bulldog Print Co, $840, open, due 2026-08-28.",
+            "Vendor shipping status: cannot ship new products while open unpaid invoice remains.",
+            "Available cash is $3,400; it covers the linked invoice.",
+            "Ticket note records evidence and dependencies; status set to awaiting_human_approval."
+          ],
+          "recommendation": "Human must decide whether to approve payment of invoice 501. Do not promise product availability or fulfillment timing while stock is zero and vendor shipping is blocked.",
+          "tools_used": [
+            "list_open_tickets()",
+            "get_ticket_details(ticket 101)",
+            "get_shop_financial_status()",
+            "request_payment_approval(ticket 101)",
+            "append_ticket_note(ticket 101)",
+            "update_ticket_status(awaiting_human_approval)"
+          ],
+          "tokens": 17673
+        },
+        {
+          "agent": "accounting",
+          "asked_by": "boss",
+          "contribution": "Invoice 501 is recorded open for $840.00, due 2026-08-28. Available cash is $3,400.00 as of 2026-08-31, so cash covers the invoice by $2,560.00. No payment or approval was made.",
+          "findings": [
+            "Ticket 101 links invoice 501.",
+            "Invoice 501: Bulldog Print Co; amount $840.00; status open; due date 2026-08-28.",
+            "Shop date: 2026-08-31, so the recorded due date has passed.",
+            "Available cash: $3,400.00; calculation: $3,400.00 − $840.00 = $2,560.00 remaining if paid.",
+            "Payment history contains no recorded payments."
+          ],
+          "recommendation": "Cash covers the recorded invoice amount. No payment or approval action taken.",
+          "tools_used": [
+            "get_ticket_details(ticket 101)",
+            "get_shop_financial_status()"
+          ],
+          "tokens": 2551
+        },
+        {
+          "agent": "customer_service",
+          "asked_by": "boss",
+          "contribution": "No customer reply draft was saved. The requested tee in size S is not in stock, and the linked vendor invoice is open, so fulfillment cannot be promised.",
+          "findings": [
+            "Ticket 101 requests 1 CC-TEE-WHITE tee, size S; ticket status is open.",
+            "MCP inventory check reports quantity 0 for CC-TEE-WHITE, size S.",
+            "Ticket pricing data lists a unit cost of $8.00 and list price of $28.00.",
+            "The ticket links invoice 501, which is open; the vendor is Bulldog Print Co."
+          ],
+          "recommendation": "Have a human review the open vendor invoice and decide what can safely be communicated. No availability or timing commitment should be made.",
+          "tools_used": [
+            "get_ticket_details(ticket 101)",
+            "check_inventory(CC-TEE-WHITE, S)"
+          ],
+          "tokens": 3353
+        },
+        {
+          "agent": "inventory",
+          "asked_by": "boss",
+          "contribution": "Ticket 101 requests 1 unit of CC-TEE-WHITE, size S. MCP records show 0 in stock and linked vendor Bulldog Print Co cannot ship new products due to an open unpaid invoice.",
+          "findings": [
+            "Ticket details: customer order, SKU CC-TEE-WHITE, size S, quantity 1; linked vendor ID 1, Bulldog Print Co.",
+            "Inventory record: CC-TEE-WHITE, size S, quantity 0, location Aisle B.",
+            "Vendor record: Bulldog Print Co, specialty apparel reprint, lead_days 5; open unpaid invoice 501 for $840.00, due 2026-08-28; can_ship_new_products=false."
+          ],
+          "recommendation": "Report the exact stock shortfall and vendor shipping block to the Boss. MCP records do not establish shipment eligibility for Bulldog Print Co while its open unpaid invoice is recorded.",
+          "tools_used": [
+            "get_ticket_details(ticket 101)",
+            "check_inventory(CC-TEE-WHITE, S)",
+            "list_vendors_with_shipping_status()"
+          ],
+          "tokens": 3800
+        }
+      ],
+      "tool_refusals": [],
+      "human_approvals": [
+        {
+          "type": "payment_request_filed_by_boss",
+          "kind": "invoice",
+          "reference_id": 501,
+          "amount": 840.0
+        },
+        {
+          "type": "payment_approved",
+          "approved_by": "Tom (approved in chat)",
+          "kind": "invoice",
+          "reference_id": 501,
+          "amount": 840.0,
+          "payment_id": 2,
+          "checking_balance_after": 160.0,
+          "time_utc": "2026-10-14T16:02:58.413+00:00"
+        },
+        {
+          "type": "resolution",
+          "resolved_by": "Tom (decided in chat)",
+          "note": "Invoice 501 ($840) to Bulldog Print Co was paid with human approval, so that vendor is no longer blocked from shipping (5-day lead time, not a guaranteed delivery date). The size S tee is still out of stock (0) and no customer message was drafted or sent, so ordering the restock and replying to the customer are manual follow-ups.",
+          "time_utc": "2026-10-14T16:03:27.038+00:00"
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "subject": "Rent due",
+      "final_status": "resolved",
+      "outcome": "Rent of $2,400.00 paid on human approval; lease 1 next due moved to 2026-10-02.",
+      "run_id": "451c9c21-b91b-4e93-b0e4-15381fbcb3da",
+      "run_started_utc": "2026-10-14T16:02:07.651+00:00",
+      "cash_change": -2400.0,
+      "agents_called": [
+        "boss",
+        "accounting",
+        "facilities"
+      ],
+      "agents_not_called": [
+        "inventory",
+        "customer_service"
+      ],
+      "delegations": [
+        {
+          "from": "boss",
+          "to": "accounting",
+          "task": "For ticket 102 only: verify the linked rent lease 1 amount and due status against accounting records, available cash, and whether payment approval should be requested under the recorded facts. Return exact evidence (amount, due date/status, cash) and any gap; do not pay."
+        },
+        {
+          "from": "boss",
+          "to": "facilities",
+          "task": "For ticket 102 only: verify linked lease 1 terms and next due date against facilities/lease records; return exact recorded evidence, no assumptions."
+        }
+      ],
+      "agents": [
+        {
+          "agent": "boss",
+          "asked_by": null,
+          "contribution": "Verified ticket 102 and linked lease 1. Rent is $2,400 due 2026-09-02; the shop date is 2026-08-31, so it is not yet overdue. Available cash is $3,400 and no rent payment is recorded. A $2,400 rent payment approval request was recorded; no payment was made.",
+          "findings": [
+            "Ticket 102 is an open rent notice from Elm City Properties, linked to lease 1.",
+            "Lease 1 records Chapel Street shop rent of $2,400 and next due date 2026-09-02; facilities confirmed no other lease terms are recorded.",
+            "Financial status reports $3,400 available cash and also an open $840 vendor invoice due 2026-08-28; records do not show that cash is reserved for that invoice.",
+            "Factual findings and the approval request were recorded in the ticket note."
+          ],
+          "recommendation": "Human review of the rent payment approval request is required. No payment or external message was made.",
+          "tools_used": [
+            "list_open_tickets()",
+            "get_ticket_details(ticket 102)",
+            "get_shop_financial_status()",
+            "request_payment_approval(ticket 102)",
+            "append_ticket_note(ticket 102)",
+            "update_ticket_status(awaiting_human_approval)"
+          ],
+          "tokens": 14356
+        },
+        {
+          "agent": "accounting",
+          "asked_by": "boss",
+          "contribution": "Ticket 102 is a rent notice linked to lease 1. Stored records show monthly rent of $2,400 due 2026-09-02; shop date is 2026-08-31, so it is due in two days and not yet overdue. Available cash is $3,400, which covers rent with $1,000 remaining before considering other obligations. No payment is recorded.",
+          "findings": [
+            "Ticket 102: open rent_notice from Elm City Properties; note says rent due in 2 days.",
+            "Lease 1: Chapel Street shop; monthly rent $2,400; next_due 2026-09-02.",
+            "Accounting shop date: 2026-08-31; due date is two calendar days later, not overdue.",
+            "Available cash: $3,400 (checking balance $3,400 dated 2026-08-31). $3,400 - $2,400 = $1,000 remaining.",
+            "Payment history is empty; no rent payment is recorded.",
+            "Other stored open invoice: $840 due 2026-08-28, status open. It is an additional recorded obligation, but the financial status does not state it is reserved or deducted from available cash. Even subtracting it, $3,400 - $2,400 - $840 = $160."
+          ],
+          "recommendation": "The recorded amount and cash support that rent is payable from available cash. A payment approval request is the Boss's decision, not payment or approval; under the recorded facts, it may be requested if the Boss chooses. No cash shortfall for rent is shown. Gap: records do not specify whether cash is reserved for the overdue invoice or other needs, and do not show any rent payment.",
+          "tools_used": [
+            "get_ticket_details(ticket 102)",
+            "get_shop_financial_status()"
+          ],
+          "tokens": 2700
+        },
+        {
+          "agent": "facilities",
+          "asked_by": "boss",
+          "contribution": "Verified the linked lease and date evidence for ticket 102. No additional lease terms or policy are recorded in the retrieved records.",
+          "findings": [
+            "Ticket 102 links to lease 1; ticket type is rent_notice and status is open.",
+            "Lease 1 records Chapel Street shop, landlord Elm City Properties, monthly rent $2,400, next due date 2026-09-02, and notes: null.",
+            "Shop date recorded as 2026-08-31. The stored next due date is two calendar days after that date.",
+            "Ticket request context says: “Email: shop rent due in 2 days.” This matches the recorded date interval.",
+            "Financial status lists lease 1 with the same rent and due date; recorded payments list is empty.",
+            "No lease clauses, grace period, late fee, or additional landlord instructions are recorded in the returned data."
+          ],
+          "recommendation": "Treat only the listed lease fields and dates as verified. Any decision about payment or further rent-notice handling requires the Boss/human; the records do not establish payment approval or additional lease policy.",
+          "tools_used": [
+            "get_ticket_details(ticket 102)",
+            "get_shop_financial_status()"
+          ],
+          "tokens": 2413
+        }
+      ],
+      "tool_refusals": [],
+      "human_approvals": [
+        {
+          "type": "payment_request_filed_by_boss",
+          "kind": "rent",
+          "reference_id": 1,
+          "amount": 2400.0
+        },
+        {
+          "type": "payment_approved",
+          "approved_by": "Tom (approved in chat)",
+          "kind": "rent",
+          "reference_id": 1,
+          "amount": 2400.0,
+          "payment_id": 1,
+          "checking_balance_after": 1000.0,
+          "time_utc": "2026-10-14T16:02:58.321+00:00"
+        },
+        {
+          "type": "resolved_by_payment",
+          "note": "The approved rent payment resolved the ticket; no separate close step was needed."
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "subject": "Bulk hoodie discount",
+      "final_status": "resolved",
+      "outcome": "Human declined the discount (no policy on file): only the 8 navy size M hoodies in stock can be offered at the $58.00 list price. No cash moved.",
+      "run_id": "77128df2-b90e-4c9a-958d-52bbe6e85985",
+      "run_started_utc": "2026-10-14T16:02:18.610+00:00",
+      "cash_change": 0,
+      "agents_called": [
+        "boss",
+        "inventory",
+        "accounting",
+        "customer_service"
+      ],
+      "agents_not_called": [
+        "facilities"
+      ],
+      "delegations": [
+        {
+          "from": "boss",
+          "to": "inventory",
+          "task": "Ticket 103 only. Verify stock availability for SKU CC-HOOD-NAVY size M quantity 20 from MCP inventory records; report exact evidence, no guessing."
+        },
+        {
+          "from": "boss",
+          "to": "accounting",
+          "task": "Ticket 103 only. Check whether any recorded pricing/discount policy or applicable approval facts exist for the 20-hoodie bulk price request. Provide exact MCP evidence; do not infer policy or approve discount."
+        },
+        {
+          "from": "boss",
+          "to": "customer_service",
+          "task": "Ticket 103 only. Using the recorded ticket, current available quantity (inventory agent confirms 8), list price $58 and cost $22, assess whether to save a clearly labeled unsent response draft. Do not invent a bulk discount or send. Report if policy/customer answer depends on missing human decision."
+        }
+      ],
+      "agents": [
+        {
+          "agent": "boss",
+          "asked_by": null,
+          "contribution": "Verified the ticket and relevant linked facts with MCP. The request is for 20 CC-HOOD-NAVY hoodies, size M; inventory shows 8 available, leaving a shortfall of 12. Recorded list price is $58/unit and unit cost is $22; no bulk-discount terms or approval are recorded. A clearly labeled unsent customer draft and a factual ticket note were saved. No message was sent and no payment was made.",
+          "findings": [
+            "No discount was quoted or approved because the records contain no authorized discount terms.",
+            "The saved draft must remain unsent pending human review.",
+            "An attempt to set awaiting_human_approval was rejected by the status tool, which directed use of request_payment_approval; that payment-specific action is inapplicable to this price request, so no approval request was filed and status was not changed."
+          ],
+          "recommendation": "Human review is required to determine whether a price override may be offered and how to handle the stock shortfall. Do not send the draft before that decision. The proper approval-request mechanism for this non-payment price override is unclear in the available tool guidance; the ticket should remain open pending a valid human-review path.",
+          "tools_used": [
+            "list_open_tickets()",
+            "get_ticket_details(ticket 103)",
+            "get_shop_financial_status()",
+            "append_ticket_note(ticket 103)",
+            "update_ticket_status(awaiting_human_approval)"
+          ],
+          "tokens": 15663
+        },
+        {
+          "agent": "inventory",
+          "asked_by": "boss",
+          "contribution": "MCP confirms ticket 103 requests 20 units of SKU CC-HOOD-NAVY, size M. Inventory shows 8 units available at Aisle A, so current stock is 12 short of the request.",
+          "findings": [
+            "Ticket 103: type price_override; SKU CC-HOOD-NAVY; size M; quantity 20; status open.",
+            "Inventory row: Basic Hoodie Big Yale, SKU CC-HOOD-NAVY, size M, quantity 8, location Aisle A.",
+            "Stock does not cover the full requested quantity; MCP evidence establishes a shortfall of 12."
+          ],
+          "recommendation": "Tell the Boss only 8 are currently recorded in stock, leaving 12 unfulfilled. If considering replenishment, check vendor and invoice status before advising further.",
+          "tools_used": [
+            "get_ticket_details(ticket 103)",
+            "check_inventory(CC-HOOD-NAVY, M)"
+          ],
+          "tokens": 2355
+        },
+        {
+          "agent": "accounting",
+          "asked_by": "boss",
+          "contribution": "Ticket 103 is an open price_override request for 20 medium CC-HOOD-NAVY hoodies. MCP data shows list price $58.00 each and unit cost $22.00 each, but no recorded bulk-pricing/discount policy or approval facts are present in the returned ticket/pricing data. No discount is approved.",
+          "findings": [
+            "get_ticket_details(103): ticket type price_override; requester Yale AI Club; subject “Bulk hoodie discount”; SKU CC-HOOD-NAVY, size M, qty 20; status open; notes: “Student org wants 20 hoodies, size M, asking for a bulk discount.”",
+            "Linked pricing record: unit_cost $22.00 and list_price $58.00. At list price, 20 × $58.00 = $1,160.00; listed unit costs total 20 × $22.00 = $440.00. These are arithmetic on stored figures, not a quoted requested price or discount.",
+            "Ticket details returned invoice=null, vendor=null, lease=null; it contains no recorded discount terms, policy, or approval. No applicable approval fact is evidenced by the MCP response.",
+            "get_shop_financial_status: desk.date_today 2026-08-31; checking $3,400.00 and available_cash $3,400.00. This is the shop cash figure; no payment or discount decision was recorded."
+          ],
+          "recommendation": "Do not infer or apply a discount. The Boss must determine whether to make any approval request; this report does not approve a discount. If considering a price, first establish the authorized price/discount terms through the appropriate human decision.",
+          "tools_used": [
+            "get_ticket_details(ticket 103)",
+            "get_shop_financial_status()"
+          ],
+          "tokens": 2640
+        },
+        {
+          "agent": "customer_service",
+          "asked_by": "boss",
+          "contribution": "Saved an unsent, clearly labeled customer response draft. It states the recorded list price and the limit of currently available stock, and explains that no bulk discount has been approved.",
+          "findings": [
+            "Ticket 103 requests 20 CC-HOOD-NAVY hoodies, size M, from Yale AI Club.",
+            "Recorded list price is $58 per unit; recorded cost is $22 per unit.",
+            "Ticket notes confirm current inventory of 8, so the requested quantity exceeds available stock by 12.",
+            "The ticket records no bulk-discount terms or approval.",
+            "Draft was saved and explicitly not sent."
+          ],
+          "recommendation": "Human review is required before any real customer contact: decide whether a price override/discount can be offered and how to address the 12-unit stock shortfall. The draft makes no discount, fulfillment, or follow-up timing commitment.",
+          "tools_used": [
+            "get_ticket_details(ticket 103)",
+            "save_customer_draft(ticket 103)"
+          ],
+          "tokens": 3797
+        }
+      ],
+      "tool_refusals": [
+        {
+          "agent": "boss",
+          "tool": "update_ticket_status",
+          "message": "Error executing tool update_ticket_status: Use request_payment_approval to record a human approval request and set this status."
+        }
+      ],
+      "human_approvals": [
+        {
+          "type": "resolution",
+          "resolved_by": "Tom (decided in chat)",
+          "note": "Human decision: no discount, because no discount policy is recorded. The club can be offered only the 8 navy size M hoodies in stock at the list price of $58.00; the other 12 would need a restock. No cash moves. Customer Service's saved draft is unsent and still says a price exception is being checked, so it must be updated before anyone sends it.",
+          "time_utc": "2026-10-14T16:03:27.127+00:00"
+        }
+      ]
+    }
+  ]
+}

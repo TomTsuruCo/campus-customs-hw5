@@ -1,0 +1,19 @@
+# secrets: never commit the real env file (the template .env.example is committed)
+.env
+.env.*
+!.env.example
+
+# dependencies and build output
+node_modules/
+dist/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# local tool config, logs, and scratch files
+.codex/
+*.log
+*.tmp
+data (2).zip
+output/desk_tickets.problem6_backup.html
